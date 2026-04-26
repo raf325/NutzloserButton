@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Das nutzlose Orakel</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s ease;
+            text-align: center;
+        }
+
+        h1 { font-size: 3rem; margin-bottom: 20px; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+
+        #oracle-button {
+            padding: 20px 40px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 50px;
+            background: white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+        }
+
+        #oracle-button:active { transform: scale(0.95); }
+
+        #result {
+            margin-top: 30px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            min-height: 50px;
+        }
+    </style>
+</head>
+<body style="background-color: #3498db;">
+
+    <h1>Soll ich es tun?</h1>
+    <button id="oracle-button">Frag das Schicksal</button>
+    <p id="result"></p>
+
+    <script>
+        const button = document.getElementById('oracle-button');
+        const resultText = document.getElementById('result');
+        const answers = [
+            "JA!", "NEIN.", "VIELLEICHT...", "FRAG MORGEN NOCHMAL.", 
+            "DEINE MUDDER SAGT JA.", "LIEBER NICHT.", "42.", 
+            "DAS IST EINE FALLE!"
+        ];
+
+        button.addEventListener('click', () => {
+            // Zufällige Antwort wählen
+            const randomAnswer = answers[Math.floor(Math.random() * answers.length)];
+            resultText.innerText = randomAnswer;
+
+            // Hintergrundfarbe zufällig ändern
+            const randomColor = `hsl(${Math.random() * 360}, 70%, 50%)`;
+            document.body.style.backgroundColor = randomColor;
+        });
+    </script>
+</body>
+</html>
