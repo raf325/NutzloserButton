@@ -34,6 +34,7 @@
             letter-spacing: 5px;
             color: #00FF00;
             text-shadow: 5px 5px 0px #ff0055;
+            user-select: none;
         }
 
         .menu-btn {
@@ -105,26 +106,54 @@
             100% { transform: scale(3); opacity: 0; }
         }
 
-        /* Spiel 3: Mal-Menü */
+        /* Spiel 3: Modernes Mal-Menü */
         #paint-controls {
             position: fixed;
-            left: 20px;
+            right: 20px;
             top: 50%;
             transform: translateY(-50%);
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            background: rgba(0,0,0,0.7);
-            padding: 15px;
-            border: 2px solid #fff;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
             z-index: 3000;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
         }
 
         .color-pick {
-            width: 30px;
-            height: 30px;
-            border: 2px solid white;
+            width: 35px;
+            height: 35px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
             cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .color-pick:hover {
+            transform: scale(1.2);
+            border-color: white;
+        }
+
+        .gravity-btn {
+            margin-top: 10px;
+            padding: 8px;
+            background: #ff0055;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.6rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .no-select {
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .back-btn {
@@ -154,7 +183,7 @@
         <button class="menu-btn" onclick="showGame('chaos')">▶ Spiel 1: Chaos Button</button>
         <button class="menu-btn" onclick="showGame('art')">▶ Spiel 2: Neon Kunst</button>
         <button class="menu-btn" onclick="showGame('paint')">▶ Spiel 3: Pixel-Gekritzel</button>
-        <p style="margin-top: 20px; font-family: sans-serif; color: #666; font-size: 0.9rem;">Kann Spuren von Pixel-Müll enthalten</p>
+        <p style="margin-top: 20px; font-family: sans-serif; color: #666; font-size: 0.9rem;" class="no-select">Kann Spuren von Pixel-Müll enthalten</p>
     </div>
 
     <button id="back-to-menu" class="back-btn" style="display:none;" onclick="location.reload()">↩ ZURÜCK</button>
@@ -164,19 +193,19 @@
     </div>
 
     <div id="game-art" class="game-container" onmousemove="drawArt(event)">
-        <h2 style="text-align: center; color: #333; margin-top: 50px;">Bewege die Maus</h2>
+        <h2 style="text-align: center; color: #333; margin-top: 50px;" class="no-select">Bewege die Maus</h2>
     </div>
 
-    <div id="game-paint" class="game-container" onmousemove="paint(event)">
+    <div id="game-paint" class="game-container" onmousemove="paint(event)" onmousedown="startPaintSound()" onmouseup="stopPaintSound()">
         <div id="paint-controls">
-            <div class="color-pick" style="background: #00FF00;" onclick="currentColor='#00FF00'"></div>
-            <div class="color-pick" style="background: #FF00FF;" onclick="currentColor='#FF00FF'"></div>
-            <div class="color-pick" style="background: #FFFF00;" onclick="currentColor='#FFFF00'"></div>
-            <div class="color-pick" style="background: #00FFFF;" onclick="currentColor='#00FFFF'"></div>
-            <div class="color-pick" style="background: #ffffff;" onclick="currentColor='#ffffff'"></div>
-            <button onclick="gravityGlitch()" style="margin-top:10px; font-size: 0.7rem; cursor:pointer;">GRAVITY GLITCH</button>
+            <div class="color-pick" style="background: #00FF00;" onclick="selectColor('#00FF00')"></div>
+            <div class="color-pick" style="background: #FF00FF;" onclick="selectColor('#FF00FF')"></div>
+            <div class="color-pick" style="background: #FFFF00;" onclick="selectColor('#FFFF00')"></div>
+            <div class="color-pick" style="background: #00FFFF;" onclick="selectColor('#00FFFF')"></div>
+            <div class="color-pick" style="background: #ffffff;" onclick="selectColor('#ffffff')"></div>
+            <button class="gravity-btn" onclick="gravityGlitch()">GRAVITY GLITCH</button>
         </div>
-        <h2 style="text-align: center; color: #333; margin-top: 50px;">Male dein Meisterwerk</h2>
+        <h2 style="text-align: center; color: #333; margin-top: 50px;" class="no-select">Male dein Meisterwerk</h2>
     </div>
 
     <script>
@@ -184,6 +213,7 @@
         const colors = ["#00FF00", "#FF00FF", "#FFFF00", "#00FFFF", "#FF4500", "#ADFF2F"];
         const messages = ["ERROR", "WARUM?", "HILFE", "NEIN", "STOPP", "LOL", "GIB AUF", "KRASS", "ZACK", "BOOM"];
         let currentColor = "#00FF00";
+        let paintOscillator = null;
 
         function showGame(type) {
             document.getElementById('menu').style.display = 'none';
@@ -245,30 +275,55 @@
         }
 
         // --- SPIEL 3 LOGIK ---
+        function selectColor(color) {
+            currentColor = color;
+            playBeep(800, 0.05);
+        }
+
+        function startPaintSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            paintOscillator = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            paintOscillator.type = 'sine';
+            paintOscillator.connect(gain);
+            gain.connect(audioCtx.destination);
+            gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
+            paintOscillator.start();
+        }
+
+        function stopPaintSound() {
+            if (paintOscillator) {
+                paintOscillator.stop();
+                paintOscillator = null;
+            }
+        }
+
         function paint(e) {
-            if(e.buttons !== 1) return; // Nur malen wenn Maustaste gedrückt
+            if(e.buttons !== 1) return;
+            if (paintOscillator) {
+                // Soundhöhe ändert sich mit Mausposition
+                paintOscillator.frequency.setValueAtTime(200 + (e.clientY / 2), audioCtx.currentTime);
+            }
             const x = e.clientX; const y = e.clientY;
             const splat = document.createElement('div');
             splat.className = 'paint-splat';
-            // Größe basierend auf Geschwindigkeit (simuliert)
-            const size = Math.abs(e.movementX + e.movementY) + 5;
+            const size = Math.abs(e.movementX + e.movementY) + 8;
             splat.style.width = size + 'px';
             splat.style.height = size + 'px';
             splat.style.left = x - size/2 + 'px';
             splat.style.top = y - size/2 + 'px';
             splat.style.backgroundColor = currentColor;
-            splat.style.boxShadow = `0 0 10px ${currentColor}`;
+            splat.style.boxShadow = `0 0 15px ${currentColor}`;
             document.getElementById('game-paint').appendChild(splat);
         }
 
         function gravityGlitch() {
-            playBeep(100, 0.5);
+            playBeep(50, 0.8);
             const splats = document.querySelectorAll('.paint-splat');
             splats.forEach(s => {
-                s.style.transition = "all 2s ease-in";
+                s.style.transition = `all ${Math.random() * 2 + 1}s cubic-bezier(.47,0,1,.32)`;
                 s.style.top = "120vh";
-                s.style.transform = `rotate(${Math.random()*360}deg)`;
-                setTimeout(() => s.remove(), 2000);
+                setTimeout(() => s.remove(), 3000);
             });
         }
     </script>
