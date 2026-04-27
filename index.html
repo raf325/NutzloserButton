@@ -18,6 +18,27 @@
             transition: background-color 0.1s;
         }
 
+        /* --- HINTERGRUND-FORMEN --- */
+        #bg-shapes {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .bg-shape {
+            position: absolute;
+            opacity: 0.18;
+            animation: floatShape linear infinite;
+        }
+
+        @keyframes floatShape {
+            0%   { transform: translateY(110vh) rotate(0deg); }
+            100% { transform: translateY(-110vh) rotate(720deg); }
+        }
+
         /* --- MENU STYLES --- */
         #menu {
             text-align: center;
@@ -89,14 +110,11 @@
             user-select: none;
         }
 
-        /* Spiel 2 & 3: Effekte */
-        .art-circle, .paint-splat {
+        /* Spiel 2 */
+        .art-circle {
             position: absolute;
             border-radius: 50%;
             pointer-events: none;
-        }
-
-        .art-circle {
             border: 2px solid white;
             animation: explode 2s forwards;
         }
@@ -106,7 +124,93 @@
             100% { transform: scale(3); opacity: 0; }
         }
 
-        /* Spiel 3: Modernes Mal-Menü */
+        /* Neue Spiel-2-Effekte */
+        .art-trail {
+            position: absolute;
+            pointer-events: none;
+            border-radius: 50%;
+            animation: fadeOut 1s forwards;
+        }
+
+        @keyframes fadeOut {
+            0%   { opacity: 0.9; transform: scale(1); }
+            100% { opacity: 0;   transform: scale(0.2); }
+        }
+
+        .art-star {
+            position: absolute;
+            pointer-events: none;
+            animation: starPop 1.5s forwards;
+            font-size: 2rem;
+        }
+
+        @keyframes starPop {
+            0%   { opacity: 1; transform: scale(0.5) rotate(0deg); }
+            80%  { opacity: 1; transform: scale(1.5) rotate(180deg); }
+            100% { opacity: 0; transform: scale(2)   rotate(360deg); }
+        }
+
+        .art-line {
+            position: absolute;
+            pointer-events: none;
+            height: 3px;
+            transform-origin: left center;
+            animation: lineDissolve 1.2s forwards;
+        }
+
+        @keyframes lineDissolve {
+            0%   { opacity: 1; }
+            100% { opacity: 0; transform: scaleX(0); }
+        }
+
+        /* Spiel 2: Kontrollleiste */
+        #art-controls {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(10px);
+            padding: 18px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            z-index: 3000;
+        }
+
+        .art-mode-btn {
+            padding: 8px 12px;
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.4);
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.65rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        .art-mode-btn:hover, .art-mode-btn.active {
+            background: white;
+            color: black;
+        }
+
+        #art-speed-label {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.55rem;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        #art-speed {
+            width: 60px;
+            accent-color: #00FF00;
+        }
+
+        /* Spiel 3: Mal-Menü */
         #paint-controls {
             position: fixed;
             right: 20px;
@@ -138,8 +242,45 @@
             border-color: white;
         }
 
+        .color-pick.selected {
+            border-color: white;
+            box-shadow: 0 0 10px white;
+            transform: scale(1.15);
+        }
+
+        .paint-tool-btn {
+            padding: 7px;
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.4);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.6rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        .paint-tool-btn:hover, .paint-tool-btn.active {
+            background: white;
+            color: black;
+        }
+
+        /* Größen-Slider */
+        #brush-size-label {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.55rem;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        #brush-size {
+            width: 60px;
+            accent-color: #00FF00;
+        }
+
         .gravity-btn {
-            margin-top: 10px;
+            margin-top: 5px;
             padding: 8px;
             background: #ff0055;
             color: white;
@@ -149,6 +290,25 @@
             font-weight: bold;
             cursor: pointer;
             text-transform: uppercase;
+        }
+
+        .clear-btn {
+            padding: 8px;
+            background: #333;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            font-size: 0.6rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        /* Spray-Effekt */
+        .paint-splat {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
         }
 
         .no-select {
@@ -170,13 +330,33 @@
 
         .glitch { animation: shake 0.1s infinite; }
         @keyframes shake {
-            0% { transform: translate(2px, 1px); }
-            50% { transform: translate(-2px, -1px); }
+            0%   { transform: translate(2px,  1px); }
+            50%  { transform: translate(-2px, -1px); }
             100% { transform: translate(2px, -1px); }
+        }
+
+        /* Spiegel-Overlay für Spiel 3 */
+        #mirror-indicator {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,0,85,0.8);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            display: none;
+            z-index: 3500;
         }
     </style>
 </head>
 <body>
+
+    <!-- Hintergrund-Formen (nur im Menü sichtbar) -->
+    <div id="bg-shapes"></div>
 
     <div id="menu">
         <h1 class="menu-title">Chaos Hub</h1>
@@ -188,35 +368,166 @@
 
     <button id="back-to-menu" class="back-btn" style="display:none;" onclick="location.reload()">↩ ZURÜCK</button>
 
+    <!-- SPIEL 1 -->
     <div id="game-chaos" class="game-container">
         <button id="oracle-button">NICHT DRÜCKEN!</button>
     </div>
 
+    <!-- SPIEL 2 -->
     <div id="game-art" class="game-container" onmousemove="drawArt(event)">
-        <h2 style="text-align: center; color: #333; margin-top: 50px;" class="no-select">Bewege die Maus</h2>
+        <h2 style="text-align:center;color:#333;margin-top:50px;" class="no-select">Bewege die Maus</h2>
+        <div id="art-controls">
+            <button class="art-mode-btn active" id="btn-circles"  onclick="setArtMode('circles')">⬤ Kreise</button>
+            <button class="art-mode-btn"        id="btn-trail"    onclick="setArtMode('trail')">✦ Spur</button>
+            <button class="art-mode-btn"        id="btn-stars"    onclick="setArtMode('stars')">★ Sterne</button>
+            <button class="art-mode-btn"        id="btn-lines"    onclick="setArtMode('lines')">— Linien</button>
+            <button class="art-mode-btn"        id="btn-firework" onclick="setArtMode('firework')">✸ Feuerwerk</button>
+            <hr style="border-color:rgba(255,255,255,0.2);">
+            <div id="art-speed-label">Geschwindigkeit</div>
+            <input type="range" id="art-speed" min="1" max="10" value="5">
+        </div>
     </div>
 
-    <div id="game-paint" class="game-container" onmousemove="paint(event)" onmousedown="startPaintSound()" onmouseup="stopPaintSound()">
+    <!-- SPIEL 3 -->
+    <div id="game-paint" class="game-container"
+         onmousemove="paint(event)"
+         onmousedown="startPaintSound()"
+         onmouseup="stopPaintSound()">
+
+        <div id="mirror-indicator">🪞 SPIEGEL-MODUS AKTIV</div>
+
         <div id="paint-controls">
-            <div class="color-pick" style="background: #00FF00;" onclick="selectColor('#00FF00')"></div>
-            <div class="color-pick" style="background: #FF00FF;" onclick="selectColor('#FF00FF')"></div>
-            <div class="color-pick" style="background: #FFFF00;" onclick="selectColor('#FFFF00')"></div>
-            <div class="color-pick" style="background: #00FFFF;" onclick="selectColor('#00FFFF')"></div>
-            <div class="color-pick" style="background: #ffffff;" onclick="selectColor('#ffffff')"></div>
+            <!-- Farben -->
+            <div class="color-pick selected" style="background:#00FF00;" onclick="selectColor('#00FF00', this)"></div>
+            <div class="color-pick"          style="background:#FF00FF;" onclick="selectColor('#FF00FF', this)"></div>
+            <div class="color-pick"          style="background:#FFFF00;" onclick="selectColor('#FFFF00', this)"></div>
+            <div class="color-pick"          style="background:#00FFFF;" onclick="selectColor('#00FFFF', this)"></div>
+            <div class="color-pick"          style="background:#ffffff;" onclick="selectColor('#ffffff', this)"></div>
+            <div class="color-pick"          style="background:#FF4500;" onclick="selectColor('#FF4500', this)"></div>
+            <div class="color-pick"          style="background:#ADFF2F;" onclick="selectColor('#ADFF2F', this)"></div>
+            <hr style="border-color:rgba(255,255,255,0.2);">
+            <!-- Pinsel-Werkzeuge -->
+            <button class="paint-tool-btn active" id="btn-brush"  onclick="selectTool('brush', this)">✏ Pinsel</button>
+            <button class="paint-tool-btn"        id="btn-spray"  onclick="selectTool('spray', this)">💨 Spray</button>
+            <button class="paint-tool-btn"        id="btn-eraser" onclick="selectTool('eraser', this)">⬜ Radierer</button>
+            <button class="paint-tool-btn"        id="btn-mirror" onclick="toggleMirror(this)">🪞 Spiegel</button>
+            <hr style="border-color:rgba(255,255,255,0.2);">
+            <!-- Pinselgröße -->
+            <div id="brush-size-label">Größe</div>
+            <input type="range" id="brush-size" min="4" max="60" value="12">
+            <hr style="border-color:rgba(255,255,255,0.2);">
             <button class="gravity-btn" onclick="gravityGlitch()">GRAVITY GLITCH</button>
+            <button class="clear-btn"   onclick="clearCanvas()">🗑 LÖSCHEN</button>
         </div>
-        <h2 style="text-align: center; color: #333; margin-top: 50px;" class="no-select">Male dein Meisterwerk</h2>
+
+        <h2 style="text-align:center;color:#333;margin-top:50px;" class="no-select">Male dein Meisterwerk</h2>
     </div>
 
     <script>
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const colors = ["#00FF00", "#FF00FF", "#FFFF00", "#00FFFF", "#FF4500", "#ADFF2F"];
-        const messages = ["ERROR", "WARUM?", "HILFE", "NEIN", "STOPP", "LOL", "GIB AUF", "KRASS", "ZACK", "BOOM"];
-        let currentColor = "#00FF00";
-        let paintOscillator = null;
+        const colors   = ["#00FF00","#FF00FF","#FFFF00","#00FFFF","#FF4500","#ADFF2F"];
+        const messages = ["ERROR","WARUM?","HILFE","NEIN","STOPP","LOL","GIB AUF","KRASS","ZACK","BOOM"];
 
+        let currentColor     = "#00FF00";
+        let paintOscillator  = null;
+        let artMode          = 'circles';
+        let paintTool        = 'brush';
+        let mirrorMode       = false;
+        let lastArtX         = null, lastArtY = null;
+
+        /* ===================== HINTERGRUND-FORMEN ===================== */
+        const shapeColors = ["#00FF00","#FF00FF","#FFFF00","#00FFFF","#FF4500","#ADFF2F","#ff0055","#7B2FFF"];
+        const bgContainer = document.getElementById('bg-shapes');
+
+        function randomShape() {
+            const type = Math.floor(Math.random() * 5); // 0=Kreis,1=Dreieck,2=Quadrat,3=Raute,4=Sechseck
+            const color = shapeColors[Math.floor(Math.random() * shapeColors.length)];
+            const size  = Math.random() * 60 + 20;
+            const dur   = Math.random() * 12 + 8;
+            const delay = Math.random() * -20;
+            const x     = Math.random() * 100; // vw
+
+            let el;
+            if (type === 0) {
+                // Kreis
+                el = document.createElement('div');
+                el.style.cssText = `
+                    width:${size}px; height:${size}px;
+                    border-radius:50%;
+                    border: 3px solid ${color};
+                    background: transparent;
+                `;
+            } else if (type === 1) {
+                // Dreieck (SVG)
+                el = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                el.setAttribute("width", size);
+                el.setAttribute("height", size);
+                const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                poly.setAttribute("points", `${size/2},0 ${size},${size} 0,${size}`);
+                poly.setAttribute("fill", "none");
+                poly.setAttribute("stroke", color);
+                poly.setAttribute("stroke-width", "3");
+                el.appendChild(poly);
+            } else if (type === 2) {
+                // Quadrat
+                el = document.createElement('div');
+                el.style.cssText = `
+                    width:${size}px; height:${size}px;
+                    border: 3px solid ${color};
+                    background: transparent;
+                `;
+            } else if (type === 3) {
+                // Raute
+                el = document.createElement('div');
+                const s2 = size * 0.7;
+                el.style.cssText = `
+                    width:${s2}px; height:${s2}px;
+                    border: 3px solid ${color};
+                    background: transparent;
+                    transform-origin: center;
+                `;
+                // rotate handled by float animation; add extra base rotation
+                el.style.transform = `rotate(45deg)`;
+            } else {
+                // Sechseck (SVG)
+                el = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                el.setAttribute("width", size);
+                el.setAttribute("height", size);
+                const cx = size/2, cy = size/2, r = size/2 - 3;
+                let pts = "";
+                for(let i=0;i<6;i++){
+                    const ang = Math.PI/180*(60*i-30);
+                    pts += `${(cx+r*Math.cos(ang)).toFixed(1)},${(cy+r*Math.sin(ang)).toFixed(1)} `;
+                }
+                const hex = document.createElementNS("http://www.w3.org/2000/svg","polygon");
+                hex.setAttribute("points", pts.trim());
+                hex.setAttribute("fill","none");
+                hex.setAttribute("stroke",color);
+                hex.setAttribute("stroke-width","3");
+                el.appendChild(hex);
+            }
+
+            el.classList.add('bg-shape');
+            el.style.left      = x + 'vw';
+            el.style.bottom    = '-20vh';
+            el.style.animationDuration  = dur + 's';
+            el.style.animationDelay     = delay + 's';
+            bgContainer.appendChild(el);
+
+            // Nach Ablauf recyceln
+            setTimeout(() => {
+                el.remove();
+                randomShape();
+            }, (dur + Math.abs(delay)) * 1000 + 500);
+        }
+
+        // 18 Formen starten
+        for(let i = 0; i < 18; i++) randomShape();
+
+        /* ===================== SHOW GAME ===================== */
         function showGame(type) {
-            document.getElementById('menu').style.display = 'none';
+            document.getElementById('menu').style.display     = 'none';
+            document.getElementById('bg-shapes').style.display = 'none';
             document.getElementById('back-to-menu').style.display = 'block';
             document.body.style.backgroundColor = '#000';
             document.querySelectorAll('.game-container').forEach(c => c.style.display = 'none');
@@ -226,58 +537,169 @@
 
         function playBeep(freq, duration) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
+            const osc  = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             osc.frequency.value = freq;
-            osc.type = 'sawtooth'; 
+            osc.type = 'sawtooth';
             gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
             osc.start();
             osc.stop(audioCtx.currentTime + duration);
         }
 
-        // --- SPIEL 1 LOGIK ---
+        /* ===================== SPIEL 1 ===================== */
         const btnChaos = document.getElementById('oracle-button');
         btnChaos.addEventListener('mouseover', () => { moveElement(btnChaos); playBeep(200, 0.05); });
-        btnChaos.addEventListener('click', () => { for(let i=0; i<5; i++) createSpam(); moveElement(btnChaos); playBeep(440, 0.1); });
+        btnChaos.addEventListener('click',     () => { for(let i=0;i<5;i++) createSpam(); moveElement(btnChaos); playBeep(440,0.1); });
 
         function moveElement(el) {
-            const x = Math.random() * (window.innerWidth - el.offsetWidth);
+            const x = Math.random() * (window.innerWidth  - el.offsetWidth);
             const y = Math.random() * (window.innerHeight - el.offsetHeight);
-            el.style.left = x + 'px'; el.style.top = y + 'px';
+            el.style.left = x + 'px';
+            el.style.top  = y + 'px';
         }
 
         function createSpam() {
             const span = document.createElement('span');
-            span.className = 'spam-text';
-            span.innerText = messages[Math.floor(Math.random() * messages.length)];
+            span.className  = 'spam-text';
+            span.innerText  = messages[Math.floor(Math.random() * messages.length)];
             span.style.left = Math.random() * 80 + "vw";
-            span.style.top = Math.random() * 80 + "vh";
-            span.style.color = colors[Math.floor(Math.random() * colors.length)];
-            span.style.fontSize = (Math.random() * 4 + 1) + "rem";
-            span.style.transform = `rotate(${Math.random() * 360}deg)`;
+            span.style.top  = Math.random() * 80 + "vh";
+            span.style.color     = colors[Math.floor(Math.random() * colors.length)];
+            span.style.fontSize  = (Math.random() * 4 + 1) + "rem";
+            span.style.transform = `rotate(${Math.random()*360}deg)`;
             if(Math.random() > 0.5) span.classList.add('glitch');
             document.getElementById('game-chaos').appendChild(span);
         }
 
-        // --- SPIEL 2 LOGIK ---
-        function drawArt(e) {
-            const x = e.clientX; const y = e.clientY;
-            const circle = document.createElement('div');
-            circle.className = 'art-circle';
-            const size = Math.random() * 50 + 10;
-            circle.style.width = size + 'px'; circle.style.height = size + 'px';
-            circle.style.left = x - size/2 + 'px'; circle.style.top = y - size/2 + 'px';
-            circle.style.borderColor = colors[Math.floor(Math.random() * colors.length)];
-            document.getElementById('game-art').appendChild(circle);
-            setTimeout(() => circle.remove(), 2000);
+        /* ===================== SPIEL 2 ===================== */
+        function setArtMode(mode) {
+            artMode = mode;
+            document.querySelectorAll('.art-mode-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + mode).classList.add('active');
+            playBeep(800, 0.05);
         }
 
-        // --- SPIEL 3 LOGIK ---
-        function selectColor(color) {
+        function drawArt(e) {
+            const x     = e.clientX;
+            const y     = e.clientY;
+            const speed = parseInt(document.getElementById('art-speed').value);
+            const c     = colors[Math.floor(Math.random() * colors.length)];
+            const game  = document.getElementById('game-art');
+
+            if (artMode === 'circles') {
+                const circle = document.createElement('div');
+                circle.className = 'art-circle';
+                const size = Math.random() * 50 + 10;
+                circle.style.width  = size + 'px';
+                circle.style.height = size + 'px';
+                circle.style.left   = x - size/2 + 'px';
+                circle.style.top    = y - size/2 + 'px';
+                circle.style.borderColor = c;
+                circle.style.animationDuration = (2 / (speed/5)) + 's';
+                game.appendChild(circle);
+                setTimeout(() => circle.remove(), 2200);
+
+            } else if (artMode === 'trail') {
+                const dot = document.createElement('div');
+                dot.className = 'art-trail';
+                const size = Math.random() * 20 + 5;
+                dot.style.width           = size + 'px';
+                dot.style.height          = size + 'px';
+                dot.style.left            = x - size/2 + 'px';
+                dot.style.top             = y - size/2 + 'px';
+                dot.style.backgroundColor = c;
+                dot.style.boxShadow       = `0 0 10px ${c}`;
+                dot.style.animationDuration = (1 / (speed/5)) + 's';
+                game.appendChild(dot);
+                setTimeout(() => dot.remove(), 1200);
+
+            } else if (artMode === 'stars') {
+                if(Math.random() > 0.6) {
+                    const star = document.createElement('div');
+                    star.className  = 'art-star';
+                    star.innerText  = ['★','✦','✸','✺','❋'][Math.floor(Math.random()*5)];
+                    star.style.left  = x + 'px';
+                    star.style.top   = y + 'px';
+                    star.style.color = c;
+                    star.style.animationDuration = (1.5 / (speed/5)) + 's';
+                    game.appendChild(star);
+                    setTimeout(() => star.remove(), 1600);
+                }
+
+            } else if (artMode === 'lines') {
+                if(lastArtX !== null) {
+                    const dx  = x - lastArtX, dy = y - lastArtY;
+                    const len = Math.sqrt(dx*dx+dy*dy);
+                    const ang = Math.atan2(dy, dx) * 180 / Math.PI;
+                    const line = document.createElement('div');
+                    line.className = 'art-line';
+                    line.style.width           = len + 'px';
+                    line.style.left            = lastArtX + 'px';
+                    line.style.top             = lastArtY + 'px';
+                    line.style.backgroundColor = c;
+                    line.style.boxShadow       = `0 0 8px ${c}`;
+                    line.style.transform       = `rotate(${ang}deg)`;
+                    line.style.animationDuration = (1.2 / (speed/5)) + 's';
+                    game.appendChild(line);
+                    setTimeout(() => line.remove(), 1300);
+                }
+
+            } else if (artMode === 'firework') {
+                if(Math.random() > 0.5) {
+                    const numParticles = 16;
+                    for(let p = 0; p < numParticles; p++) {
+                        const part = document.createElement('div');
+                        part.className = 'art-trail';
+                        const size  = Math.random() * 18 + 8;
+                        const angle = (Math.PI * 2 / numParticles) * p + Math.random() * 0.3;
+                        const dist  = Math.random() * 180 + 80;
+                        const tx    = Math.cos(angle) * dist;
+                        const ty    = Math.sin(angle) * dist;
+                        part.style.width           = size + 'px';
+                        part.style.height          = size + 'px';
+                        part.style.left            = x - size/2 + 'px';
+                        part.style.top             = y - size/2 + 'px';
+                        part.style.backgroundColor = c;
+                        part.style.boxShadow       = `0 0 20px ${c}, 0 0 40px ${c}`;
+                        part.style.transition      = `all ${0.6 + Math.random()*0.8}s ease-out`;
+                        game.appendChild(part);
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                part.style.transform = `translate(${tx}px, ${ty}px)`;
+                                part.style.opacity   = '0';
+                            });
+                        });
+                        setTimeout(() => part.remove(), 1600);
+                    }
+                }
+            }
+
+            lastArtX = x;
+            lastArtY = y;
+        }
+
+        /* ===================== SPIEL 3 ===================== */
+        function selectColor(color, el) {
             currentColor = color;
+            document.querySelectorAll('.color-pick').forEach(c => c.classList.remove('selected'));
+            if(el) el.classList.add('selected');
             playBeep(800, 0.05);
+        }
+
+        function selectTool(tool, el) {
+            paintTool = tool;
+            document.querySelectorAll('.paint-tool-btn').forEach(b => b.classList.remove('active'));
+            if(el) el.classList.add('active');
+            playBeep(600, 0.04);
+        }
+
+        function toggleMirror(el) {
+            mirrorMode = !mirrorMode;
+            el.classList.toggle('active', mirrorMode);
+            document.getElementById('mirror-indicator').style.display = mirrorMode ? 'block' : 'none';
+            playBeep(mirrorMode ? 900 : 400, 0.05);
         }
 
         function startPaintSound() {
@@ -292,29 +714,69 @@
         }
 
         function stopPaintSound() {
-            if (paintOscillator) {
-                paintOscillator.stop();
-                paintOscillator = null;
-            }
+            if (paintOscillator) { paintOscillator.stop(); paintOscillator = null; }
+        }
+
+        function placeSplat(x, y, size, color, game) {
+            const splat = document.createElement('div');
+            splat.className = 'paint-splat';
+            splat.style.width           = size + 'px';
+            splat.style.height          = size + 'px';
+            splat.style.left            = x - size/2 + 'px';
+            splat.style.top             = y - size/2 + 'px';
+            splat.style.backgroundColor = color;
+            splat.style.boxShadow       = `0 0 15px ${color}`;
+            game.appendChild(splat);
         }
 
         function paint(e) {
             if(e.buttons !== 1) return;
             if (paintOscillator) {
-                // Soundhöhe ändert sich mit Mausposition
                 paintOscillator.frequency.setValueAtTime(200 + (e.clientY / 2), audioCtx.currentTime);
             }
-            const x = e.clientX; const y = e.clientY;
-            const splat = document.createElement('div');
-            splat.className = 'paint-splat';
-            const size = Math.abs(e.movementX + e.movementY) + 8;
-            splat.style.width = size + 'px';
-            splat.style.height = size + 'px';
-            splat.style.left = x - size/2 + 'px';
-            splat.style.top = y - size/2 + 'px';
-            splat.style.backgroundColor = currentColor;
-            splat.style.boxShadow = `0 0 15px ${currentColor}`;
-            document.getElementById('game-paint').appendChild(splat);
+
+            const x    = e.clientX;
+            const y    = e.clientY;
+            const game = document.getElementById('game-paint');
+            const brushSize = parseInt(document.getElementById('brush-size').value);
+            const activeColor = paintTool === 'eraser' ? '#000000' : currentColor;
+
+            if (paintTool === 'spray') {
+                // Spray: viele kleine zufällige Punkte im Radius
+                for(let i = 0; i < 12; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const r     = Math.random() * brushSize;
+                    const sx    = x + Math.cos(angle) * r;
+                    const sy    = y + Math.sin(angle) * r;
+                    const dot   = document.createElement('div');
+                    dot.className           = 'paint-splat';
+                    dot.style.width         = '3px';
+                    dot.style.height        = '3px';
+                    dot.style.left          = sx + 'px';
+                    dot.style.top           = sy + 'px';
+                    dot.style.backgroundColor = activeColor;
+                    dot.style.boxShadow     = `0 0 4px ${activeColor}`;
+                    game.appendChild(dot);
+
+                    if (mirrorMode) {
+                        const mdot = dot.cloneNode();
+                        mdot.style.left = (window.innerWidth - sx) + 'px';
+                        game.appendChild(mdot);
+                    }
+                }
+            } else {
+                // Pinsel oder Radierer
+                const size = paintTool === 'eraser'
+                    ? brushSize * 2
+                    : Math.abs(e.movementX + e.movementY) + brushSize;
+                placeSplat(x, y, size, activeColor, game);
+
+                if (mirrorMode) {
+                    // Gespiegelter Punkt (horizontal)
+                    const mx = window.innerWidth - x;
+                    placeSplat(mx, y, size, activeColor, game);
+                }
+            }
         }
 
         function gravityGlitch() {
@@ -325,6 +787,11 @@
                 s.style.top = "120vh";
                 setTimeout(() => s.remove(), 3000);
             });
+        }
+
+        function clearCanvas() {
+            playBeep(300, 0.1);
+            document.querySelectorAll('.paint-splat').forEach(s => s.remove());
         }
     </script>
 </body>
