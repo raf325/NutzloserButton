@@ -15,7 +15,7 @@
             justify-content: center;
             align-items: center;
             color: white;
-            user-select: none;
+            transition: background-color 0.1s;
         }
 
         /* --- MENU STYLES --- */
@@ -28,9 +28,10 @@
         }
 
         .menu-title {
-            font-size: clamp(2rem, 8vw, 4rem);
+            font-size: 4rem;
             margin-bottom: 20px;
             text-transform: uppercase;
+            letter-spacing: 5px;
             color: #00FF00;
             text-shadow: 5px 5px 0px #ff0055;
         }
@@ -42,11 +43,15 @@
             color: white;
             border: 3px solid white;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s;
             text-transform: uppercase;
         }
 
-        .menu-btn:hover { background: white; color: black; transform: scale(1.05); }
+        .menu-btn:hover {
+            background: white;
+            color: black;
+            transform: scale(1.05);
+        }
 
         /* --- GAME CONTAINERS --- */
         .game-container {
@@ -54,45 +59,91 @@
             width: 100%;
             height: 100%;
             position: absolute;
-            top: 0; left: 0;
+            top: 0;
+            left: 0;
         }
 
-        /* SPIEL 1: Chaos Button */
+        /* Spiel 1: Chaos Button */
         #oracle-button {
-            padding: 25px 50px; font-size: 1.8rem; cursor: pointer;
-            border: 4px solid white; background: #ff0055; color: white;
-            position: absolute; z-index: 10; box-shadow: 0 0 20px #ff0055;
+            padding: 25px 50px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            border: 4px solid white;
+            background: #ff0055;
+            color: white;
+            font-weight: bold;
+            position: absolute;
+            z-index: 10;
+            transition: all 0.1s ease;
+            box-shadow: 0 0 20px #ff0055;
         }
 
         .spam-text {
-            position: absolute; pointer-events: none; z-index: 99;
-            font-weight: 900; text-transform: uppercase; white-space: nowrap;
+            position: absolute;
+            pointer-events: none;
+            z-index: 99;
+            font-weight: 900;
+            text-transform: uppercase;
+            white-space: nowrap;
+            user-select: none;
         }
 
-        /* SPIEL 2: Neon Kunst */
+        /* Spiel 2 & 3: Effekte */
+        .art-circle, .paint-splat {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
         .art-circle {
-            position: absolute; border-radius: 50%; pointer-events: none;
-            border: 2px solid white; animation: explode 2s forwards;
+            border: 2px solid white;
+            animation: explode 2s forwards;
         }
 
-        /* SPIEL 3: Toxic Paint */
-        #paint-canvas { width: 100%; height: 100%; cursor: crosshair; }
-        #paint-tools {
-            position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
-            display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.7);
-            padding: 15px; border: 2px solid white; z-index: 2001;
+        @keyframes explode {
+            0% { transform: scale(0.1); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
         }
-        .color-dot { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
-        .color-dot:hover { border-color: white; }
 
-        /* ALLGEMEIN */
-        @keyframes explode { 0% { transform: scale(0.1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
-        .glitch { animation: shake 0.1s infinite; }
-        @keyframes shake { 0% { transform: translate(2px, 1px); } 50% { transform: translate(-2px, -1px); } 100% { transform: translate(2px, -1px); } }
-        
+        /* Spiel 3: Mal-Menü */
+        #paint-controls {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: rgba(0,0,0,0.7);
+            padding: 15px;
+            border: 2px solid #fff;
+            z-index: 3000;
+        }
+
+        .color-pick {
+            width: 30px;
+            height: 30px;
+            border: 2px solid white;
+            cursor: pointer;
+        }
+
         .back-btn {
-            position: fixed; top: 20px; left: 20px; z-index: 3000;
-            padding: 10px; background: #ff0055; color: white; border: none; cursor: pointer;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 4000;
+            padding: 10px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid white;
+            color: white;
+            cursor: pointer;
+        }
+
+        .glitch { animation: shake 0.1s infinite; }
+        @keyframes shake {
+            0% { transform: translate(2px, 1px); }
+            50% { transform: translate(-2px, -1px); }
+            100% { transform: translate(2px, -1px); }
         }
     </style>
 </head>
@@ -102,38 +153,37 @@
         <h1 class="menu-title">Chaos Hub</h1>
         <button class="menu-btn" onclick="showGame('chaos')">▶ Spiel 1: Chaos Button</button>
         <button class="menu-btn" onclick="showGame('art')">▶ Spiel 2: Neon Kunst</button>
-        <button class="menu-btn" onclick="showGame('paint')">▶ Spiel 3: Toxic Paint</button>
-        <p style="margin-top: 20px; font-family: sans-serif; color: #666; font-size: 0.9rem;">
-            Kann Spuren von Pixel-Müll enthalten
-        </p>
+        <button class="menu-btn" onclick="showGame('paint')">▶ Spiel 3: Pixel-Gekritzel</button>
+        <p style="margin-top: 20px; font-family: sans-serif; color: #666; font-size: 0.9rem;">Kann Spuren von Pixel-Müll enthalten</p>
     </div>
 
-    <button id="back-to-menu" class="back-btn" style="display:none;" onclick="location.reload()">↩ MENÜ</button>
+    <button id="back-to-menu" class="back-btn" style="display:none;" onclick="location.reload()">↩ ZURÜCK</button>
 
     <div id="game-chaos" class="game-container">
         <button id="oracle-button">NICHT DRÜCKEN!</button>
     </div>
 
-    <div id="game-art" class="game-container" onmousemove="drawArt(event)"></div>
+    <div id="game-art" class="game-container" onmousemove="drawArt(event)">
+        <h2 style="text-align: center; color: #333; margin-top: 50px;">Bewege die Maus</h2>
+    </div>
 
-    <div id="game-paint" class="game-container">
-        <canvas id="paint-canvas"></canvas>
-        <div id="paint-tools">
-            <div class="color-dot" style="background:#00FF00" onclick="selectedColor='#00FF00'"></div>
-            <div class="color-dot" style="background:#FF00FF" onclick="selectedColor='#FF00FF'"></div>
-            <div class="color-dot" style="background:#00FFFF" onclick="selectedColor='#00FFFF'"></div>
-            <div class="color-dot" style="background:#FFFF00" onclick="selectedColor='#FFFF00'"></div>
-            <div class="color-dot" style="background:#FFFFFF" onclick="selectedColor='#FFFFFF'"></div>
-            <hr>
-            <button onclick="clearCanvas()" style="cursor:pointer">LÖSCHEN</button>
+    <div id="game-paint" class="game-container" onmousemove="paint(event)">
+        <div id="paint-controls">
+            <div class="color-pick" style="background: #00FF00;" onclick="currentColor='#00FF00'"></div>
+            <div class="color-pick" style="background: #FF00FF;" onclick="currentColor='#FF00FF'"></div>
+            <div class="color-pick" style="background: #FFFF00;" onclick="currentColor='#FFFF00'"></div>
+            <div class="color-pick" style="background: #00FFFF;" onclick="currentColor='#00FFFF'"></div>
+            <div class="color-pick" style="background: #ffffff;" onclick="currentColor='#ffffff'"></div>
+            <button onclick="gravityGlitch()" style="margin-top:10px; font-size: 0.7rem; cursor:pointer;">GRAVITY GLITCH</button>
         </div>
+        <h2 style="text-align: center; color: #333; margin-top: 50px;">Male dein Meisterwerk</h2>
     </div>
 
     <script>
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const colors = ["#00FF00", "#FF00FF", "#00FFFF", "#FFFF00", "#FF4500", "#ADFF2F"];
-        const messages = ["ERROR", "WARUM?", "HILFE", "NEIN", "STOPP", "LOL", "GIB AUF", "KRASS"];
-        let selectedColor = "#00FF00";
+        const colors = ["#00FF00", "#FF00FF", "#FFFF00", "#00FFFF", "#FF4500", "#ADFF2F"];
+        const messages = ["ERROR", "WARUM?", "HILFE", "NEIN", "STOPP", "LOL", "GIB AUF", "KRASS", "ZACK", "BOOM"];
+        let currentColor = "#00FF00";
 
         function showGame(type) {
             document.getElementById('menu').style.display = 'none';
@@ -141,7 +191,6 @@
             document.body.style.backgroundColor = '#000';
             document.querySelectorAll('.game-container').forEach(c => c.style.display = 'none');
             document.getElementById('game-' + type).style.display = 'block';
-            if(type === 'paint') initPaint();
             playBeep(600, 0.1);
         }
 
@@ -149,71 +198,79 @@
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.frequency.value = freq; osc.type = 'sawtooth';
-            gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
-            osc.start(); osc.stop(audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = freq;
+            osc.type = 'sawtooth'; 
+            gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
         }
 
         // --- SPIEL 1 LOGIK ---
         const btnChaos = document.getElementById('oracle-button');
-        btnChaos.addEventListener('mouseover', () => moveEl(btnChaos));
-        btnChaos.addEventListener('click', () => {
-            for(let i=0; i<5; i++) createSpam();
-            moveEl(btnChaos);
-            playBeep(440, 0.1);
-        });
-        function moveEl(el) {
-            el.style.left = Math.random() * (window.innerWidth - el.offsetWidth) + 'px';
-            el.style.top = Math.random() * (window.innerHeight - el.offsetHeight) + 'px';
+        btnChaos.addEventListener('mouseover', () => { moveElement(btnChaos); playBeep(200, 0.05); });
+        btnChaos.addEventListener('click', () => { for(let i=0; i<5; i++) createSpam(); moveElement(btnChaos); playBeep(440, 0.1); });
+
+        function moveElement(el) {
+            const x = Math.random() * (window.innerWidth - el.offsetWidth);
+            const y = Math.random() * (window.innerHeight - el.offsetHeight);
+            el.style.left = x + 'px'; el.style.top = y + 'px';
         }
+
         function createSpam() {
-            const s = document.createElement('span'); s.className = 'spam-text';
-            s.innerText = messages[Math.floor(Math.random() * messages.length)];
-            s.style.left = Math.random() * 80 + "vw"; s.style.top = Math.random() * 80 + "vh";
-            s.style.color = colors[Math.floor(Math.random() * colors.length)];
-            s.style.fontSize = (Math.random() * 3 + 1) + "rem";
-            if(Math.random() > 0.5) s.classList.add('glitch');
-            document.getElementById('game-chaos').appendChild(s);
+            const span = document.createElement('span');
+            span.className = 'spam-text';
+            span.innerText = messages[Math.floor(Math.random() * messages.length)];
+            span.style.left = Math.random() * 80 + "vw";
+            span.style.top = Math.random() * 80 + "vh";
+            span.style.color = colors[Math.floor(Math.random() * colors.length)];
+            span.style.fontSize = (Math.random() * 4 + 1) + "rem";
+            span.style.transform = `rotate(${Math.random() * 360}deg)`;
+            if(Math.random() > 0.5) span.classList.add('glitch');
+            document.getElementById('game-chaos').appendChild(span);
         }
 
         // --- SPIEL 2 LOGIK ---
         function drawArt(e) {
-            const c = document.createElement('div'); c.className = 'art-circle';
-            const size = Math.random() * 40 + 10;
-            c.style.width = size + 'px'; c.style.height = size + 'px';
-            c.style.left = e.clientX - size/2 + 'px'; c.style.top = e.clientY - size/2 + 'px';
-            c.style.borderColor = colors[Math.floor(Math.random() * colors.length)];
-            document.getElementById('game-art').appendChild(c);
-            setTimeout(() => c.remove(), 2000);
+            const x = e.clientX; const y = e.clientY;
+            const circle = document.createElement('div');
+            circle.className = 'art-circle';
+            const size = Math.random() * 50 + 10;
+            circle.style.width = size + 'px'; circle.style.height = size + 'px';
+            circle.style.left = x - size/2 + 'px'; circle.style.top = y - size/2 + 'px';
+            circle.style.borderColor = colors[Math.floor(Math.random() * colors.length)];
+            document.getElementById('game-art').appendChild(circle);
+            setTimeout(() => circle.remove(), 2000);
         }
 
-        // --- SPIEL 3 LOGIK (Toxic Paint) ---
-        let canvas, ctx, painting = false;
-        function initPaint() {
-            canvas = document.getElementById('paint-canvas');
-            ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            canvas.addEventListener('mousedown', () => painting = true);
-            canvas.addEventListener('mouseup', () => painting = false);
-            canvas.addEventListener('mousemove', drawPaint);
+        // --- SPIEL 3 LOGIK ---
+        function paint(e) {
+            if(e.buttons !== 1) return; // Nur malen wenn Maustaste gedrückt
+            const x = e.clientX; const y = e.clientY;
+            const splat = document.createElement('div');
+            splat.className = 'paint-splat';
+            // Größe basierend auf Geschwindigkeit (simuliert)
+            const size = Math.abs(e.movementX + e.movementY) + 5;
+            splat.style.width = size + 'px';
+            splat.style.height = size + 'px';
+            splat.style.left = x - size/2 + 'px';
+            splat.style.top = y - size/2 + 'px';
+            splat.style.backgroundColor = currentColor;
+            splat.style.boxShadow = `0 0 10px ${currentColor}`;
+            document.getElementById('game-paint').appendChild(splat);
         }
-        function drawPaint(e) {
-            if(!painting) return;
-            ctx.fillStyle = selectedColor;
-            ctx.beginPath();
-            const r = Math.random() * 15 + 2;
-            ctx.arc(e.clientX, e.clientY, r, 0, Math.PI * 2);
-            ctx.fill();
-            // Spritzer-Effekt
-            if(Math.random() > 0.8) {
-                ctx.arc(e.clientX + (Math.random()-0.5)*40, e.clientY + (Math.random()-0.5)*40, r/3, 0, Math.PI * 2);
-                ctx.fill();
-                playBeep(Math.random()*100 + 100, 0.01);
-            }
+
+        function gravityGlitch() {
+            playBeep(100, 0.5);
+            const splats = document.querySelectorAll('.paint-splat');
+            splats.forEach(s => {
+                s.style.transition = "all 2s ease-in";
+                s.style.top = "120vh";
+                s.style.transform = `rotate(${Math.random()*360}deg)`;
+                setTimeout(() => s.remove(), 2000);
+            });
         }
-        function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); playBeep(200, 0.3); }
     </script>
 </body>
 </html>
