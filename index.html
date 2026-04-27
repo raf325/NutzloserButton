@@ -3,17 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sinnlos-Overload</title>
+    <title>Chaos Hub 2026</title>
     <style>
+        /* Gemeinsames Design */
         body {
             margin: 0;
             height: 100vh;
-            background-color: #000;
+            background-color: #1a1a1a;
             font-family: 'Arial Black', sans-serif;
-            overflow: hidden; /* Verhindert Scrollbalken beim Spam */
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
+            color: white;
+        }
+
+        /* MENU STYLES */
+        #menu {
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .menu-title {
+            font-size: 4rem;
+            margin-bottom: 50px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            color: #00FF00;
+            text-shadow: 5px 5px 0px #ff0055;
+        }
+
+        .menu-btn {
+            padding: 20px 40px;
+            font-size: 1.5rem;
+            background: transparent;
+            color: white;
+            border: 3px solid white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .menu-btn:hover {
+            background: white;
+            color: black;
+            transform: scale(1.1);
+        }
+
+        /* GAME STYLES (Dein Original Design) */
+        #game-container {
+            display: none; /* Am Anfang versteckt */
+            width: 100%;
+            height: 100%;
         }
 
         #oracle-button {
@@ -24,17 +64,16 @@
             background: #ff0055;
             color: white;
             font-weight: bold;
-            position: absolute; /* Wichtig für die Bewegung */
-            z-index: 10; /* Niedriger als der Spam */
+            position: absolute;
+            z-index: 10;
             transition: all 0.1s ease;
             box-shadow: 0 0 20px #ff0055;
         }
 
-        /* Die Stil-Klasse für den Text-Spam */
         .spam-text {
             position: absolute;
-            pointer-events: none; /* Man kann durch den Text durchklicken */
-            z-index: 99; /* Immer über dem Button */
+            pointer-events: none;
+            z-index: 99;
             font-weight: 900;
             text-transform: uppercase;
             white-space: nowrap;
@@ -51,16 +90,35 @@
 </head>
 <body>
 
-    <button id="oracle-button">NICHT DRÜCKEN!</button>
+    <div id="menu">
+        <h1 class="menu-title">Chaos Hub</h1>
+        <button class="menu-btn" onclick="startGame()">▶ SPIEL STARTEN</button>
+        <p style="margin-top: 20px; font-family: sans-serif; color: #666;">Warnung: Kann Spuren von Pixel-Müll enthalten.</p>
+    </div>
+
+    <div id="game-container">
+        <button id="oracle-button">NICHT DRÜCKEN!</button>
+    </div>
 
     <script>
+        const menu = document.getElementById('menu');
+        const gameContainer = document.getElementById('game-container');
         const button = document.getElementById('oracle-button');
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
         const messages = ["ERROR", "WARUM?", "HILFE", "NEIN", "STOPP", "LOL", "GIB AUF", "KRASS", "ZACK", "BOOM"];
         const colors = ["#00FF00", "#FF00FF", "#FFFF00", "#00FFFF", "#FF4500", "#ADFF2F"];
 
+        // Funktion um das Spiel zu starten
+        function startGame() {
+            menu.style.display = 'none'; // Menü ausblenden
+            gameContainer.style.display = 'block'; // Spiel einblenden
+            document.body.style.backgroundColor = '#000'; // Hintergrund schwarz machen
+            playBeep(600, 0.2); // Start-Sound
+        }
+
         function playBeep(freq, duration) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
@@ -76,19 +134,12 @@
             const span = document.createElement('span');
             span.className = 'spam-text';
             span.innerText = messages[Math.floor(Math.random() * messages.length)];
-            
-            // Zufällige Position
-            span.style.left = Math.random() * 90 + "vw";
-            span.style.top = Math.random() * 90 + "vh";
-            
-            // Zufälliges Design
+            span.style.left = Math.random() * 80 + "vw";
+            span.style.top = Math.random() * 80 + "vh";
             span.style.color = colors[Math.floor(Math.random() * colors.length)];
             span.style.fontSize = (Math.random() * 4 + 1) + "rem";
             span.style.transform = `rotate(${Math.random() * 360}deg)`;
-            
-            // 50% Chance auf Glitch-Animation
             if(Math.random() > 0.5) span.classList.add('glitch');
-
             document.body.appendChild(span);
         }
 
@@ -99,23 +150,15 @@
             button.style.top = y + 'px';
         }
 
-        // Button flüchtet beim Drüberfahren
         button.addEventListener('mouseover', () => {
             moveButton();
             playBeep(200, 0.05);
         });
 
-        // Button-Klick Aktion
         button.addEventListener('click', () => {
-            // Jedes Mal 5 neue Texte erzeugen
-            for(let i=0; i<5; i++) {
-                createSpam();
-            }
-            
+            for(let i=0; i<5; i++) { createSpam(); }
             moveButton();
             playBeep(440, 0.1);
-            
-            // Hintergrund kurz aufblitzen lassen
             document.body.style.backgroundColor = "white";
             setTimeout(() => { document.body.style.backgroundColor = "black"; }, 50);
         });
