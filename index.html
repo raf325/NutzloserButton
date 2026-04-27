@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Das nutzlose Orakel</title>
+    <title>Das nutzlose Orakel mit Sound</title>
     <style>
         body {
             margin: 0;
@@ -15,6 +15,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             transition: background-color 0.3s ease;
             text-align: center;
+            overflow: hidden;
         }
 
         h1 { font-size: 3rem; margin-bottom: 20px; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
@@ -28,42 +29,66 @@
             background: white;
             box-shadow: 0 10px 20px rgba(0,0,0,0.2);
             transition: transform 0.1s;
+            z-index: 10;
         }
 
-        #oracle-button:active { transform: scale(0.95); }
+        #oracle-button:active { transform: scale(0.9); }
 
         #result {
             margin-top: 30px;
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: bold;
             color: white;
-            min-height: 50px;
+            min-height: 60px;
+            text-shadow: 1px 1px 10px rgba(0,0,0,0.2);
         }
     </style>
 </head>
 <body style="background-color: #3498db;">
 
     <h1>Soll ich es tun?</h1>
+    
     <button id="oracle-button">Frag das Schicksal</button>
+    
     <p id="result"></p>
+
+    <audio id="click-sound" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
+    <audio id="win-sound" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
 
     <script>
         const button = document.getElementById('oracle-button');
         const resultText = document.getElementById('result');
+        const clickSound = document.getElementById('click-sound');
+        const winSound = document.getElementById('win-sound');
+
         const answers = [
             "JA!", "NEIN.", "VIELLEICHT...", "FRAG MORGEN NOCHMAL.", 
             "DEINE MUDDER SAGT JA.", "LIEBER NICHT.", "42.", 
-            "DAS IST EINE FALLE!"
+            "DAS IST EINE FALLE!", "NUR WENN ES REGNET."
         ];
 
         button.addEventListener('click', () => {
-            // Zufällige Antwort wählen
+            // 1. Zufällige Antwort auswählen
             const randomAnswer = answers[Math.floor(Math.random() * answers.length)];
             resultText.innerText = randomAnswer;
 
-            // Hintergrundfarbe zufällig ändern
+            // 2. Sound abspielen
+            // Wenn die Antwort "JA!" ist, spielen wir die Fanfare, sonst den Plopp
+            if (randomAnswer === "JA!") {
+                winSound.currentTime = 0; // Sound zurücksetzen, falls er noch spielt
+                winSound.play();
+            } else {
+                clickSound.currentTime = 0;
+                clickSound.play();
+            }
+
+            // 3. Hintergrundfarbe zufällig ändern
             const randomColor = `hsl(${Math.random() * 360}, 70%, 50%)`;
             document.body.style.backgroundColor = randomColor;
+
+            // 4. Kleiner visueller Effekt: Button wackelt kurz
+            button.style.transform = "rotate(" + (Math.random() * 10 - 5) + "deg)";
+            setTimeout(() => { button.style.transform = "rotate(0deg)"; }, 100);
         });
     </script>
 </body>
