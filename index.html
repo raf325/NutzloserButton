@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chaos Hub 2026</title>
     <style>
-        /* Gemeinsames Design */
         body {
             margin: 0;
             height: 100vh;
@@ -16,17 +15,21 @@
             justify-content: center;
             align-items: center;
             color: white;
+            transition: background-color 0.1s;
         }
 
-        /* MENU STYLES */
+        /* --- MENU STYLES --- */
         #menu {
             text-align: center;
             z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         .menu-title {
             font-size: 4rem;
-            margin-bottom: 50px;
+            margin-bottom: 30px;
             text-transform: uppercase;
             letter-spacing: 5px;
             color: #00FF00;
@@ -35,27 +38,32 @@
 
         .menu-btn {
             padding: 20px 40px;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             background: transparent;
             color: white;
             border: 3px solid white;
             cursor: pointer;
             transition: all 0.3s;
+            text-transform: uppercase;
         }
 
         .menu-btn:hover {
             background: white;
             color: black;
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
 
-        /* GAME STYLES (Dein Original Design) */
-        #game-container {
-            display: none; /* Am Anfang versteckt */
+        /* --- GAME CONTAINERS --- */
+        .game-container {
+            display: none;
             width: 100%;
             height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
 
+        /* Spiel 1: Chaos Button */
         #oracle-button {
             padding: 25px 50px;
             font-size: 1.8rem;
@@ -80,11 +88,37 @@
             user-select: none;
         }
 
-        .glitch { animation: shake 0.1s infinite; }
+        /* Spiel 2: Kunst-Effekt */
+        .art-circle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            border: 2px solid white;
+            animation: explode 2s forwards;
+        }
+
+        @keyframes explode {
+            0% { transform: scale(0.1); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+
         @keyframes shake {
             0% { transform: translate(2px, 1px); }
             50% { transform: translate(-2px, -1px); }
             100% { transform: translate(2px, -1px); }
+        }
+        .glitch { animation: shake 0.1s infinite; }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 2000;
+            padding: 10px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid white;
+            color: white;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -92,29 +126,37 @@
 
     <div id="menu">
         <h1 class="menu-title">Chaos Hub</h1>
-        <button class="menu-btn" onclick="startGame()">▶ SPIEL STARTEN</button>
-        <p style="margin-top: 20px; font-family: sans-serif; color: #666;">Warnung: Kann Spuren von Pixel-Müll enthalten.</p>
+        <button class="menu-btn" onclick="showGame('chaos')">▶ Spiel 1: Chaos Button</button>
+        <button class="menu-btn" onclick="showGame('art')">▶ Spiel 2: Neon Kunst</button>
     </div>
 
-    <div id="game-container">
+    <button id="back-to-menu" class="back-btn" style="display:none;" onclick="location.reload()">↩ ZURÜCK</button>
+
+    <div id="game-chaos" class="game-container">
         <button id="oracle-button">NICHT DRÜCKEN!</button>
     </div>
 
+    <div id="game-art" class="game-container" onmousemove="drawArt(event)" ontouchmove="drawArt(event)">
+        <h2 style="text-align: center; color: #555; margin-top: 50px;">Bewege die Maus / den Finger</h2>
+    </div>
+
     <script>
-        const menu = document.getElementById('menu');
-        const gameContainer = document.getElementById('game-container');
-        const button = document.getElementById('oracle-button');
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-        const messages = ["ERROR", "WARUM?", "HILFE", "NEIN", "STOPP", "LOL", "GIB AUF", "KRASS", "ZACK", "BOOM"];
         const colors = ["#00FF00", "#FF00FF", "#FFFF00", "#00FFFF", "#FF4500", "#ADFF2F"];
+        const messages = ["ERROR", "WARUM?", "HILFE", "NEIN", "STOPP", "LOL", "GIB AUF", "KRASS", "ZACK", "BOOM"];
 
-        // Funktion um das Spiel zu starten
-        function startGame() {
-            menu.style.display = 'none'; // Menü ausblenden
-            gameContainer.style.display = 'block'; // Spiel einblenden
-            document.body.style.backgroundColor = '#000'; // Hintergrund schwarz machen
-            playBeep(600, 0.2); // Start-Sound
+        // --- NAVIGATION ---
+        function showGame(type) {
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('back-to-menu').style.display = 'block';
+            document.body.style.backgroundColor = '#000';
+            
+            if(type === 'chaos') {
+                document.getElementById('game-chaos').style.display = 'block';
+            } else {
+                document.getElementById('game-art').style.display = 'block';
+            }
+            playBeep(600, 0.1);
         }
 
         function playBeep(freq, duration) {
@@ -130,6 +172,25 @@
             osc.stop(audioCtx.currentTime + duration);
         }
 
+        // --- LOGIK SPIEL 1 (CHAOS) ---
+        const btnChaos = document.getElementById('oracle-button');
+        btnChaos.addEventListener('mouseover', () => {
+            moveElement(btnChaos);
+            playBeep(200, 0.05);
+        });
+        btnChaos.addEventListener('click', () => {
+            for(let i=0; i<5; i++) createSpam();
+            moveElement(btnChaos);
+            playBeep(440, 0.1);
+        });
+
+        function moveElement(el) {
+            const x = Math.random() * (window.innerWidth - el.offsetWidth);
+            const y = Math.random() * (window.innerHeight - el.offsetHeight);
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+        }
+
         function createSpam() {
             const span = document.createElement('span');
             span.className = 'spam-text';
@@ -140,28 +201,31 @@
             span.style.fontSize = (Math.random() * 4 + 1) + "rem";
             span.style.transform = `rotate(${Math.random() * 360}deg)`;
             if(Math.random() > 0.5) span.classList.add('glitch');
-            document.body.appendChild(span);
+            document.getElementById('game-chaos').appendChild(span);
         }
 
-        function moveButton() {
-            const x = Math.random() * (window.innerWidth - button.offsetWidth);
-            const y = Math.random() * (window.innerHeight - button.offsetHeight);
-            button.style.left = x + 'px';
-            button.style.top = y + 'px';
+        // --- LOGIK SPIEL 2 (KUNST) ---
+        function drawArt(e) {
+            const x = e.clientX || e.touches[0].clientX;
+            const y = e.clientY || e.touches[0].clientY;
+            
+            const circle = document.createElement('div');
+            circle.className = 'art-circle';
+            const size = Math.random() * 50 + 10;
+            circle.style.width = size + 'px';
+            circle.style.height = size + 'px';
+            circle.style.left = x - size/2 + 'px';
+            circle.style.top = y - size/2 + 'px';
+            circle.style.borderColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            document.getElementById('game-art').appendChild(circle);
+            
+            // Sound-Feedback (sehr dezent)
+            if(Math.random() > 0.9) playBeep(Math.random() * 1000 + 500, 0.02);
+
+            // Nach der Animation löschen
+            setTimeout(() => circle.remove(), 2000);
         }
-
-        button.addEventListener('mouseover', () => {
-            moveButton();
-            playBeep(200, 0.05);
-        });
-
-        button.addEventListener('click', () => {
-            for(let i=0; i<5; i++) { createSpam(); }
-            moveButton();
-            playBeep(440, 0.1);
-            document.body.style.backgroundColor = "white";
-            setTimeout(() => { document.body.style.backgroundColor = "black"; }, 50);
-        });
     </script>
 </body>
 </html>
