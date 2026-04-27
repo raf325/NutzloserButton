@@ -15,7 +15,7 @@
             justify-content: center;
             align-items: center;
             color: white;
-            transition: background-color 0.1s;
+            user-select: none;
         }
 
         /* --- MENU STYLES --- */
@@ -24,34 +24,29 @@
             z-index: 1000;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
 
         .menu-title {
-            font-size: 4rem;
-            margin-bottom: 30px;
+            font-size: clamp(2rem, 8vw, 4rem);
+            margin-bottom: 20px;
             text-transform: uppercase;
-            letter-spacing: 5px;
             color: #00FF00;
             text-shadow: 5px 5px 0px #ff0055;
         }
 
         .menu-btn {
-            padding: 20px 40px;
-            font-size: 1.2rem;
+            padding: 15px 30px;
+            font-size: 1.1rem;
             background: transparent;
             color: white;
             border: 3px solid white;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: 0.3s;
             text-transform: uppercase;
         }
 
-        .menu-btn:hover {
-            background: white;
-            color: black;
-            transform: scale(1.05);
-        }
+        .menu-btn:hover { background: white; color: black; transform: scale(1.05); }
 
         /* --- GAME CONTAINERS --- */
         .game-container {
@@ -59,66 +54,45 @@
             width: 100%;
             height: 100%;
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 0; left: 0;
         }
 
-        /* Spiel 1: Chaos Button */
+        /* SPIEL 1: Chaos Button */
         #oracle-button {
-            padding: 25px 50px;
-            font-size: 1.8rem;
-            cursor: pointer;
-            border: 4px solid white;
-            background: #ff0055;
-            color: white;
-            font-weight: bold;
-            position: absolute;
-            z-index: 10;
-            transition: all 0.1s ease;
-            box-shadow: 0 0 20px #ff0055;
+            padding: 25px 50px; font-size: 1.8rem; cursor: pointer;
+            border: 4px solid white; background: #ff0055; color: white;
+            position: absolute; z-index: 10; box-shadow: 0 0 20px #ff0055;
         }
 
         .spam-text {
-            position: absolute;
-            pointer-events: none;
-            z-index: 99;
-            font-weight: 900;
-            text-transform: uppercase;
-            white-space: nowrap;
-            user-select: none;
+            position: absolute; pointer-events: none; z-index: 99;
+            font-weight: 900; text-transform: uppercase; white-space: nowrap;
         }
 
-        /* Spiel 2: Kunst-Effekt */
+        /* SPIEL 2: Neon Kunst */
         .art-circle {
-            position: absolute;
-            border-radius: 50%;
-            pointer-events: none;
-            border: 2px solid white;
-            animation: explode 2s forwards;
+            position: absolute; border-radius: 50%; pointer-events: none;
+            border: 2px solid white; animation: explode 2s forwards;
         }
 
-        @keyframes explode {
-            0% { transform: scale(0.1); opacity: 1; }
-            100% { transform: scale(3); opacity: 0; }
+        /* SPIEL 3: Toxic Paint */
+        #paint-canvas { width: 100%; height: 100%; cursor: crosshair; }
+        #paint-tools {
+            position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+            display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.7);
+            padding: 15px; border: 2px solid white; z-index: 2001;
         }
+        .color-dot { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+        .color-dot:hover { border-color: white; }
 
-        @keyframes shake {
-            0% { transform: translate(2px, 1px); }
-            50% { transform: translate(-2px, -1px); }
-            100% { transform: translate(2px, -1px); }
-        }
+        /* ALLGEMEIN */
+        @keyframes explode { 0% { transform: scale(0.1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
         .glitch { animation: shake 0.1s infinite; }
-
+        @keyframes shake { 0% { transform: translate(2px, 1px); } 50% { transform: translate(-2px, -1px); } 100% { transform: translate(2px, -1px); } }
+        
         .back-btn {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 2000;
-            padding: 10px;
-            background: rgba(255,255,255,0.2);
-            border: 1px solid white;
-            color: white;
-            cursor: pointer;
+            position: fixed; top: 20px; left: 20px; z-index: 3000;
+            padding: 10px; background: #ff0055; color: white; border: none; cursor: pointer;
         }
     </style>
 </head>
@@ -128,34 +102,46 @@
         <h1 class="menu-title">Chaos Hub</h1>
         <button class="menu-btn" onclick="showGame('chaos')">▶ Spiel 1: Chaos Button</button>
         <button class="menu-btn" onclick="showGame('art')">▶ Spiel 2: Neon Kunst</button>
+        <button class="menu-btn" onclick="showGame('paint')">▶ Spiel 3: Toxic Paint</button>
+        <p style="margin-top: 20px; font-family: sans-serif; color: #666; font-size: 0.9rem;">
+            Kann Spuren von Pixel-Müll enthalten
+        </p>
     </div>
 
-    <button id="back-to-menu" class="back-btn" style="display:none;" onclick="location.reload()">↩ ZURÜCK</button>
+    <button id="back-to-menu" class="back-btn" style="display:none;" onclick="location.reload()">↩ MENÜ</button>
 
     <div id="game-chaos" class="game-container">
         <button id="oracle-button">NICHT DRÜCKEN!</button>
     </div>
 
-    <div id="game-art" class="game-container" onmousemove="drawArt(event)" ontouchmove="drawArt(event)">
-        <h2 style="text-align: center; color: #555; margin-top: 50px;">Bewege die Maus / den Finger</h2>
+    <div id="game-art" class="game-container" onmousemove="drawArt(event)"></div>
+
+    <div id="game-paint" class="game-container">
+        <canvas id="paint-canvas"></canvas>
+        <div id="paint-tools">
+            <div class="color-dot" style="background:#00FF00" onclick="selectedColor='#00FF00'"></div>
+            <div class="color-dot" style="background:#FF00FF" onclick="selectedColor='#FF00FF'"></div>
+            <div class="color-dot" style="background:#00FFFF" onclick="selectedColor='#00FFFF'"></div>
+            <div class="color-dot" style="background:#FFFF00" onclick="selectedColor='#FFFF00'"></div>
+            <div class="color-dot" style="background:#FFFFFF" onclick="selectedColor='#FFFFFF'"></div>
+            <hr>
+            <button onclick="clearCanvas()" style="cursor:pointer">LÖSCHEN</button>
+        </div>
     </div>
 
     <script>
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const colors = ["#00FF00", "#FF00FF", "#FFFF00", "#00FFFF", "#FF4500", "#ADFF2F"];
-        const messages = ["ERROR", "WARUM?", "HILFE", "NEIN", "STOPP", "LOL", "GIB AUF", "KRASS", "ZACK", "BOOM"];
+        const colors = ["#00FF00", "#FF00FF", "#00FFFF", "#FFFF00", "#FF4500", "#ADFF2F"];
+        const messages = ["ERROR", "WARUM?", "HILFE", "NEIN", "STOPP", "LOL", "GIB AUF", "KRASS"];
+        let selectedColor = "#00FF00";
 
-        // --- NAVIGATION ---
         function showGame(type) {
             document.getElementById('menu').style.display = 'none';
             document.getElementById('back-to-menu').style.display = 'block';
             document.body.style.backgroundColor = '#000';
-            
-            if(type === 'chaos') {
-                document.getElementById('game-chaos').style.display = 'block';
-            } else {
-                document.getElementById('game-art').style.display = 'block';
-            }
+            document.querySelectorAll('.game-container').forEach(c => c.style.display = 'none');
+            document.getElementById('game-' + type).style.display = 'block';
+            if(type === 'paint') initPaint();
             playBeep(600, 0.1);
         }
 
@@ -163,69 +149,71 @@
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.frequency.value = freq;
-            osc.type = 'sawtooth'; 
-            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            osc.start();
-            osc.stop(audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.frequency.value = freq; osc.type = 'sawtooth';
+            gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
         }
 
-        // --- LOGIK SPIEL 1 (CHAOS) ---
+        // --- SPIEL 1 LOGIK ---
         const btnChaos = document.getElementById('oracle-button');
-        btnChaos.addEventListener('mouseover', () => {
-            moveElement(btnChaos);
-            playBeep(200, 0.05);
-        });
+        btnChaos.addEventListener('mouseover', () => moveEl(btnChaos));
         btnChaos.addEventListener('click', () => {
             for(let i=0; i<5; i++) createSpam();
-            moveElement(btnChaos);
+            moveEl(btnChaos);
             playBeep(440, 0.1);
         });
-
-        function moveElement(el) {
-            const x = Math.random() * (window.innerWidth - el.offsetWidth);
-            const y = Math.random() * (window.innerHeight - el.offsetHeight);
-            el.style.left = x + 'px';
-            el.style.top = y + 'px';
+        function moveEl(el) {
+            el.style.left = Math.random() * (window.innerWidth - el.offsetWidth) + 'px';
+            el.style.top = Math.random() * (window.innerHeight - el.offsetHeight) + 'px';
         }
-
         function createSpam() {
-            const span = document.createElement('span');
-            span.className = 'spam-text';
-            span.innerText = messages[Math.floor(Math.random() * messages.length)];
-            span.style.left = Math.random() * 80 + "vw";
-            span.style.top = Math.random() * 80 + "vh";
-            span.style.color = colors[Math.floor(Math.random() * colors.length)];
-            span.style.fontSize = (Math.random() * 4 + 1) + "rem";
-            span.style.transform = `rotate(${Math.random() * 360}deg)`;
-            if(Math.random() > 0.5) span.classList.add('glitch');
-            document.getElementById('game-chaos').appendChild(span);
+            const s = document.createElement('span'); s.className = 'spam-text';
+            s.innerText = messages[Math.floor(Math.random() * messages.length)];
+            s.style.left = Math.random() * 80 + "vw"; s.style.top = Math.random() * 80 + "vh";
+            s.style.color = colors[Math.floor(Math.random() * colors.length)];
+            s.style.fontSize = (Math.random() * 3 + 1) + "rem";
+            if(Math.random() > 0.5) s.classList.add('glitch');
+            document.getElementById('game-chaos').appendChild(s);
         }
 
-        // --- LOGIK SPIEL 2 (KUNST) ---
+        // --- SPIEL 2 LOGIK ---
         function drawArt(e) {
-            const x = e.clientX || e.touches[0].clientX;
-            const y = e.clientY || e.touches[0].clientY;
-            
-            const circle = document.createElement('div');
-            circle.className = 'art-circle';
-            const size = Math.random() * 50 + 10;
-            circle.style.width = size + 'px';
-            circle.style.height = size + 'px';
-            circle.style.left = x - size/2 + 'px';
-            circle.style.top = y - size/2 + 'px';
-            circle.style.borderColor = colors[Math.floor(Math.random() * colors.length)];
-            
-            document.getElementById('game-art').appendChild(circle);
-            
-            // Sound-Feedback (sehr dezent)
-            if(Math.random() > 0.9) playBeep(Math.random() * 1000 + 500, 0.02);
-
-            // Nach der Animation löschen
-            setTimeout(() => circle.remove(), 2000);
+            const c = document.createElement('div'); c.className = 'art-circle';
+            const size = Math.random() * 40 + 10;
+            c.style.width = size + 'px'; c.style.height = size + 'px';
+            c.style.left = e.clientX - size/2 + 'px'; c.style.top = e.clientY - size/2 + 'px';
+            c.style.borderColor = colors[Math.floor(Math.random() * colors.length)];
+            document.getElementById('game-art').appendChild(c);
+            setTimeout(() => c.remove(), 2000);
         }
+
+        // --- SPIEL 3 LOGIK (Toxic Paint) ---
+        let canvas, ctx, painting = false;
+        function initPaint() {
+            canvas = document.getElementById('paint-canvas');
+            ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            canvas.addEventListener('mousedown', () => painting = true);
+            canvas.addEventListener('mouseup', () => painting = false);
+            canvas.addEventListener('mousemove', drawPaint);
+        }
+        function drawPaint(e) {
+            if(!painting) return;
+            ctx.fillStyle = selectedColor;
+            ctx.beginPath();
+            const r = Math.random() * 15 + 2;
+            ctx.arc(e.clientX, e.clientY, r, 0, Math.PI * 2);
+            ctx.fill();
+            // Spritzer-Effekt
+            if(Math.random() > 0.8) {
+                ctx.arc(e.clientX + (Math.random()-0.5)*40, e.clientY + (Math.random()-0.5)*40, r/3, 0, Math.PI * 2);
+                ctx.fill();
+                playBeep(Math.random()*100 + 100, 0.01);
+            }
+        }
+        function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); playBeep(200, 0.3); }
     </script>
 </body>
 </html>
